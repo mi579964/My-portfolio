@@ -107,10 +107,12 @@ function renderProjects(filter) {
     card.dataset.id = p.id;
 
     card.innerHTML = `
-      <button class="card-edit-btn" data-id="${p.id}" title="편집">✏</button>
       <div class="card-top">
         <span class="card-icon">${p.icon}</span>
-        <span class="card-badge">${categoryLabel(p.category)}</span>
+        <div class="card-top-right">
+          <span class="card-badge">${categoryLabel(p.category)}</span>
+          <button class="card-edit-btn" data-id="${p.id}" title="편집">✏ 편집</button>
+        </div>
       </div>
       <h3>${p.title}</h3>
       <p>${p.desc}</p>
