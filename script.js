@@ -111,7 +111,8 @@ function renderProjects(filter) {
         <span class="card-icon">${p.icon}</span>
         <div class="card-top-right">
           <span class="card-badge">${categoryLabel(p.category)}</span>
-          <button class="card-edit-btn" data-id="${p.id}" title="편집">✏ 편집</button>
+          <button class="card-edit-btn"   data-id="${p.id}" title="편집">✏ 편집</button>
+          <button class="card-delete-btn" data-id="${p.id}" title="삭제">🗑 삭제</button>
         </div>
       </div>
       <h3>${p.title}</h3>
@@ -126,6 +127,7 @@ function renderProjects(filter) {
     `;
 
     card.querySelector('.card-edit-btn').addEventListener('click', () => openEditModal(p.id));
+    card.querySelector('.card-delete-btn').addEventListener('click', () => openConfirm(p.id));
     grid.appendChild(card);
   });
 }
@@ -146,10 +148,63 @@ const EMOJI_LIST = [
 /* ── 편집 모달 ── */
 let currentFilter = 'all';
 
+/* ── 프로젝트 추가 ── */
+function openAddModal() {
+  document.getElementById('modal-title').textContent = '프로젝트 추가';
+  document.getElementById('edit-id').value      = '';
+  document.getElementById('edit-category').value = 'web';
+  document.getElementById('edit-title').value   = '';
+  document.getElementById('edit-desc').value    = '';
+  document.getElementById('edit-tags').value    = '';
+  document.getElementById('edit-demo').value    = '';
+  document.getElementById('edit-github').value  = '';
+  selectEmoji('🚀');
+
+  document.getElementById('edit-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('edit-title').focus();
+}
+
+/* ── 삭제 확인 ── */
+let pendingDeleteId = null;
+
+function openConfirm(id) {
+  const p = PROJECTS.find(p => p.id === id);
+  if (!p) return;
+  pendingDeleteId = id;
+  document.getElementById('confirm-desc').textContent = `"${p.title}" 프로젝트를 삭제하면 되돌릴 수 없습니다.`;
+  document.getElementById('confirm-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeConfirm() {
+  pendingDeleteId = null;
+  document.getElementById('confirm-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function initConfirm() {
+  document.getElementById('confirm-cancel').addEventListener('click', closeConfirm);
+  document.getElementById('confirm-ok').addEventListener('click', () => {
+    if (pendingDeleteId === null) return;
+    const idx = PROJECTS.findIndex(p => p.id === pendingDeleteId);
+    if (idx !== -1) PROJECTS.splice(idx, 1);
+    closeConfirm();
+    renderProjects(currentFilter);
+  });
+  document.getElementById('confirm-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('confirm-overlay')) closeConfirm();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('confirm-overlay').classList.contains('open')) closeConfirm();
+  });
+}
+
 function openEditModal(id) {
   const p = PROJECTS.find(p => p.id === id);
   if (!p) return;
 
+  document.getElementById('modal-title').textContent = '프로젝트 편집';
   document.getElementById('edit-id').value       = p.id;
   document.getElementById('edit-category').value = p.category;
   selectEmoji(p.icon);
@@ -226,24 +281,32 @@ function initEditModal() {
   form.addEventListener('submit', e => {
     e.preventDefault();
 
-    const id  = Number(document.getElementById('edit-id').value);
-    const idx = PROJECTS.findIndex(p => p.id === id);
-    if (idx === -1) return;
-
+    const idVal   = document.getElementById('edit-id').value;
     const rawTags = document.getElementById('edit-tags').value;
     const demoVal = document.getElementById('edit-demo').value.trim();
     const ghVal   = document.getElementById('edit-github').value.trim();
 
-    PROJECTS[idx] = {
-      ...PROJECTS[idx],
-      icon:     document.getElementById('edit-icon').value.trim()     || PROJECTS[idx].icon,
+    const data = {
+      icon:     document.getElementById('edit-icon').value.trim() || '🚀',
       category: document.getElementById('edit-category').value,
       title:    document.getElementById('edit-title').value.trim(),
       desc:     document.getElementById('edit-desc').value.trim(),
       tags:     rawTags.split(',').map(t => t.trim()).filter(Boolean),
-      demo:     demoVal   || '#',
-      github:   ghVal     || '#',
+      demo:     demoVal || '#',
+      github:   ghVal   || '#',
     };
+
+    if (!data.title || !data.desc) return;
+
+    if (idVal) {
+      // 수정
+      const idx = PROJECTS.findIndex(p => p.id === Number(idVal));
+      if (idx !== -1) PROJECTS[idx] = { ...PROJECTS[idx], ...data };
+    } else {
+      // 추가
+      const newId = PROJECTS.length ? Math.max(...PROJECTS.map(p => p.id)) + 1 : 1;
+      PROJECTS.push({ id: newId, ...data });
+    }
 
     closeEditModal();
     renderProjects(currentFilter);
@@ -391,4 +454,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initContactForm();
   initScrollReveal();
   initEditModal();
+  initConfirm();
+  document.getElementById('add-project-btn').addEventListener('click', openAddModal);
 });

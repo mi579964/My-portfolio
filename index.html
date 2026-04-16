@@ -56,11 +56,14 @@
         <p class="section-sub">직접 만든 프로젝트들을 소개합니다.</p>
       </div>
 
-      <div class="filter-bar">
-        <button class="filter-btn active" data-filter="all">전체</button>
-        <button class="filter-btn" data-filter="web">웹</button>
-        <button class="filter-btn" data-filter="app">앱</button>
-        <button class="filter-btn" data-filter="api">API</button>
+      <div class="projects-toolbar">
+        <div class="filter-bar">
+          <button class="filter-btn active" data-filter="all">전체</button>
+          <button class="filter-btn" data-filter="web">웹</button>
+          <button class="filter-btn" data-filter="app">앱</button>
+          <button class="filter-btn" data-filter="api">API</button>
+        </div>
+        <button class="btn btn-primary add-project-btn" id="add-project-btn">＋ 프로젝트 추가</button>
       </div>
 
       <div class="projects-grid" id="projects-grid">
@@ -131,7 +134,7 @@
   <div id="edit-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="프로젝트 편집">
     <div class="modal-box">
       <div class="modal-header">
-        <h3>프로젝트 편집</h3>
+        <h3 id="modal-title">프로젝트 편집</h3>
         <button class="modal-close" id="modal-close" aria-label="닫기">✕</button>
       </div>
       <form id="edit-form" novalidate>
@@ -180,6 +183,19 @@
           <button type="submit" class="btn btn-primary">저장</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ── 삭제 확인 다이얼로그 ── -->
+  <div id="confirm-overlay" class="confirm-overlay" role="dialog" aria-modal="true">
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <h4>프로젝트를 삭제할까요?</h4>
+      <p id="confirm-desc">이 작업은 되돌릴 수 없습니다.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-outline" id="confirm-cancel">취소</button>
+        <button class="btn btn-danger"  id="confirm-ok">삭제</button>
+      </div>
     </div>
   </div>
 
