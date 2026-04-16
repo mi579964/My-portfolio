@@ -136,19 +136,24 @@
       </div>
       <form id="edit-form" novalidate>
         <input type="hidden" id="edit-id" />
-        <div class="modal-form-grid">
-          <div class="form-group">
-            <label for="edit-icon">아이콘 (이모지)</label>
-            <input type="text" id="edit-icon" placeholder="🛒" maxlength="4" />
+        <div class="form-group">
+          <label>아이콘 선택</label>
+          <div class="emoji-picker">
+            <div class="emoji-grid" id="emoji-grid"></div>
+            <div class="emoji-selected-wrap">
+              <span class="emoji-selected-label">선택된 아이콘</span>
+              <span class="emoji-preview" id="emoji-preview">🛒</span>
+              <input type="text" id="edit-icon" class="emoji-custom-input" placeholder="직접 입력" maxlength="4" />
+            </div>
           </div>
-          <div class="form-group">
-            <label for="edit-category">카테고리</label>
-            <select id="edit-category">
-              <option value="web">웹</option>
-              <option value="app">앱</option>
-              <option value="api">API</option>
-            </select>
-          </div>
+        </div>
+        <div class="form-group">
+          <label for="edit-category">카테고리</label>
+          <select id="edit-category">
+            <option value="web">웹</option>
+            <option value="app">앱</option>
+            <option value="api">API</option>
+          </select>
         </div>
         <div class="form-group">
           <label for="edit-title">제목</label>

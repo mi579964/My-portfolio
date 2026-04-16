@@ -693,10 +693,90 @@ section {
   gap: 14px;
 }
 
-.modal-form-grid {
+/* 이모지 피커 */
+.emoji-picker {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.emoji-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  padding: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.emoji-grid::-webkit-scrollbar { width: 4px; }
+.emoji-grid::-webkit-scrollbar-track { background: transparent; }
+.emoji-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.emoji-btn {
+  width: 100%;
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), transform var(--transition);
+  line-height: 1;
+}
+
+.emoji-btn:hover {
+  background: rgba(91, 80, 232, 0.12);
+  transform: scale(1.2);
+}
+
+.emoji-btn.selected {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  box-shadow: 0 2px 8px rgba(91, 80, 232, 0.4);
+}
+
+.emoji-selected-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+}
+
+.emoji-selected-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.emoji-preview {
+  font-size: 1.6rem;
+  line-height: 1;
+  min-width: 32px;
+  text-align: center;
+}
+
+.emoji-custom-input {
+  flex: 1;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  padding: 6px 10px !important;
+  font-size: 0.85rem !important;
+  color: var(--text) !important;
+  outline: none;
+  font-family: inherit;
+}
+
+.emoji-custom-input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(91, 80, 232, 0.12) !important;
 }
 
 #edit-form .form-group label {

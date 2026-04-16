@@ -134,6 +134,15 @@ function categoryLabel(cat) {
   return { web: '웹', app: '앱', api: 'API' }[cat] ?? cat;
 }
 
+/* ── 이모지 목록 ── */
+const EMOJI_LIST = [
+  '🛒','📊','📱','🤖','🗺️','💬','🎮','🎵','📸','✈️',
+  '🏠','💼','📚','🔬','🎨','🖥️','⚡','🔒','🌐','📡',
+  '🚀','💡','🛠️','🎯','📝','🔧','💳','🧩','📦','🌟',
+  '🤝','📈','🏆','🎬','🔐','🧪','🌍','💻','🖨️','📲',
+  '👾','🎤','🧠','🔮','🦾','🌈','🏗️','🧭','🎁','🔑',
+];
+
 /* ── 편집 모달 ── */
 let currentFilter = 'all';
 
@@ -142,8 +151,8 @@ function openEditModal(id) {
   if (!p) return;
 
   document.getElementById('edit-id').value       = p.id;
-  document.getElementById('edit-icon').value     = p.icon;
   document.getElementById('edit-category').value = p.category;
+  selectEmoji(p.icon);
   document.getElementById('edit-title').value    = p.title;
   document.getElementById('edit-desc').value     = p.desc;
   document.getElementById('edit-tags').value     = p.tags.join(', ');
@@ -160,9 +169,46 @@ function closeEditModal() {
   document.body.style.overflow = '';
 }
 
+function buildEmojiGrid() {
+  const grid    = document.getElementById('emoji-grid');
+  const preview = document.getElementById('emoji-preview');
+  const input   = document.getElementById('edit-icon');
+  grid.innerHTML = '';
+
+  EMOJI_LIST.forEach(emoji => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'emoji-btn';
+    btn.textContent = emoji;
+    btn.dataset.emoji = emoji;
+    btn.addEventListener('click', () => {
+      selectEmoji(emoji);
+    });
+    grid.appendChild(btn);
+  });
+
+  // 직접 입력 시 프리뷰 갱신
+  input.addEventListener('input', () => {
+    const val = input.value.trim();
+    if (val) {
+      preview.textContent = val;
+      grid.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+    }
+  });
+}
+
+function selectEmoji(emoji) {
+  document.getElementById('edit-icon').value   = emoji;
+  document.getElementById('emoji-preview').textContent = emoji;
+  document.querySelectorAll('.emoji-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.emoji === emoji);
+  });
+}
+
 function initEditModal() {
   const modal   = document.getElementById('edit-modal');
   const form    = document.getElementById('edit-form');
+  buildEmojiGrid();
 
   // 닫기 버튼
   document.getElementById('modal-close').addEventListener('click', closeEditModal);
