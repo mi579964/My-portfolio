@@ -111,8 +111,10 @@ function renderProjects(filter) {
         <span class="card-icon">${p.icon}</span>
         <div class="card-top-right">
           <span class="card-badge">${categoryLabel(p.category)}</span>
+          ${isAdmin ? `
           <button class="card-edit-btn"   data-id="${p.id}" title="편집">✏ 편집</button>
           <button class="card-delete-btn" data-id="${p.id}" title="삭제">🗑 삭제</button>
+          ` : ''}
         </div>
       </div>
       <h3>${p.title}</h3>
@@ -126,14 +128,85 @@ function renderProjects(filter) {
       </div>
     `;
 
-    card.querySelector('.card-edit-btn').addEventListener('click', () => openEditModal(p.id));
-    card.querySelector('.card-delete-btn').addEventListener('click', () => openConfirm(p.id));
+    if (isAdmin) {
+      card.querySelector('.card-edit-btn').addEventListener('click', () => openEditModal(p.id));
+      card.querySelector('.card-delete-btn').addEventListener('click', () => openConfirm(p.id));
+    }
     grid.appendChild(card);
   });
 }
 
 function categoryLabel(cat) {
   return { web: '웹', app: '앱', api: 'API' }[cat] ?? cat;
+}
+
+/* ── 인증 ── */
+const ADMIN_ID = 'mi579964';
+const ADMIN_PW = 'mi579964';
+
+let isAdmin = sessionStorage.getItem('admin') === 'true';
+
+function setAdminUI() {
+  document.getElementById('btn-login').classList.toggle('hidden', isAdmin);
+  document.getElementById('admin-badge').classList.toggle('hidden', !isAdmin);
+  document.getElementById('add-project-btn').classList.toggle('hidden', !isAdmin);
+  // 카드 버튼은 renderProjects에서 처리
+}
+
+function initAuth() {
+  // 로그인 버튼
+  document.getElementById('btn-login').addEventListener('click', () => {
+    document.getElementById('login-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('login-id').focus();
+  });
+
+  // 로그인 모달 닫기
+  document.getElementById('login-modal-close').addEventListener('click', closeLoginModal);
+  document.getElementById('login-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('login-modal')) closeLoginModal();
+  });
+
+  // 로그인 폼 제출
+  document.getElementById('login-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const id = document.getElementById('login-id').value.trim();
+    const pw = document.getElementById('login-pw').value;
+    const err = document.getElementById('login-error');
+
+    if (id === ADMIN_ID && pw === ADMIN_PW) {
+      isAdmin = true;
+      sessionStorage.setItem('admin', 'true');
+      closeLoginModal();
+      setAdminUI();
+      renderProjects(currentFilter);
+    } else {
+      err.classList.remove('hidden');
+      document.getElementById('login-pw').value = '';
+      document.getElementById('login-pw').focus();
+      setTimeout(() => err.classList.add('hidden'), 3000);
+    }
+  });
+
+  // 로그아웃
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    isAdmin = false;
+    sessionStorage.removeItem('admin');
+    setAdminUI();
+    renderProjects(currentFilter);
+  });
+
+  // ESC 닫기
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('login-modal').classList.contains('open')) closeLoginModal();
+  });
+}
+
+function closeLoginModal() {
+  document.getElementById('login-modal').classList.remove('open');
+  document.getElementById('login-form').reset();
+  document.getElementById('login-error').classList.add('hidden');
+  document.body.style.overflow = '';
 }
 
 /* ── 이모지 목록 ── */
@@ -453,6 +526,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initHamburger();
   initContactForm();
   initScrollReveal();
+  initAuth();
+  setAdminUI();
   initEditModal();
   initConfirm();
   document.getElementById('add-project-btn').addEventListener('click', openAddModal);
